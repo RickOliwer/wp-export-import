@@ -25,7 +25,7 @@ export function createApp(): Express {
     res.json({
       message: "Server is running",
       timestamp: new Date().toISOString(),
-      routes: ["/api/health", "/api/import"],
+      routes: ["/api/health", "/api/import", "/api/customers"],
     });
   });
 
@@ -45,16 +45,16 @@ export function createApp(): Express {
 
   console.log("Middleware setup complete");
 
-  // Import routes after basic setup
+  // Import main routes (which includes both import and customer routes)
   try {
-    console.log("Loading import routes...");
-    import("@routes/import.routes.js")
-      .then(({ routes }) => {
-        app.use("/api", routes);
-        console.log("✅ Import routes loaded");
+    console.log("Loading routes...");
+    import("@routes/index.js")
+      .then((routesModule) => {
+        app.use("/api", routesModule.default);
+        console.log("✅ All routes loaded");
       })
       .catch((err) => {
-        console.error("❌ Failed to load import routes:", err);
+        console.error("❌ Failed to load routes:", err);
       });
   } catch (error) {
     console.error("❌ Error importing routes:", error);

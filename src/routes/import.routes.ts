@@ -1,13 +1,10 @@
 import { Router, type Request, type Response } from "express";
+import type { Router as RouterType } from "express";
 import multer from "multer";
-import {
-  importCSV,
-  importJSON,
-  testCSVImport,
-} from "@controllers/import.controller.js";
+import { importJSON, testCSVImport } from "@controllers/import.controller.js";
 
-const upload = multer({ dest: "uploads/" });
-export const routes: Router = Router();
+// const upload = multer({ dest: "uploads/" });
+export const routes: RouterType = Router();
 
 routes.get("/health", (_req: Request, res: Response) => res.json({ ok: true }));
 routes.post("/import/json", (req: Request, res: Response) =>
