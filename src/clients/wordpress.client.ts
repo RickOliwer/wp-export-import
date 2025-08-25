@@ -1,6 +1,6 @@
 import { env } from "config/index.js";
 
-const AUTH = `Basic ${env.WP_USER}:${env.WP_APP_PASSWORD}`;
+const AUTH = `Basic ${Buffer.from(`${env.WP_USER}:${env.WP_APP_PASSWORD}`).toString("base64")}`;
 
 async function wp<T>(path: string, init?: RequestInit): Promise<T> {
   const res = await fetch(`${env.WP_SITE}${path}`, {

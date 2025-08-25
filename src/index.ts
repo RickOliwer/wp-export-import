@@ -1,12 +1,35 @@
-import express, { type Request, type Response } from "express";
 import "dotenv/config";
+import { createApp } from "./app.js";
 
-const app = express();
-app.use(express.json());
+const port = Number(process.env.PORT || 3000);
 
-app.get("/", (_req: Request, res: Response) =>
-  res.json({ message: "WP Export/Import API" })
-);
-app.get("/health", (_req: Request, res: Response) => res.json({ ok: true }));
+console.log("Starting server...");
 
-app.listen(3000, () => console.log("API on http://localhost:3000"));
+try {
+  const app = createApp();
+  console.log("App created successfully");
+
+  const server = app.listen(port, () => {
+    console.log(`✅ API running on http://localhost:${port}`);
+    console.log(`Test endpoints:`);
+    console.log(`  - http://localhost:${port}/`);
+    console.log(`  - http://localhost:${port}/api/health`);
+  });
+
+  server.on("error", (err) => {
+    console.error("❌ Server error:", err);
+  });
+
+  process.on("uncaughtException", (err) => {
+    console.error("❌ Uncaught Exception:", err);
+    process.exit(1);
+  });
+
+  process.on("unhandledRejection", (reason, promise) => {
+    console.error("❌ Unhandled Rejection at:", promise, "reason:", reason);
+    process.exit(1);
+  });
+} catch (error) {
+  console.error("❌ Failed to start server:", error);
+  process.exit(1);
+}

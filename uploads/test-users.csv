@@ -1,0 +1,7 @@
+email,username,first_name,last_name,roles,um_role
+john.doe@example.com,johndoe,Johnn,Doe,customer,customer
+jane.smith@example.com,janesmith,Jane,Smith,customer|subscriber,subscriber
+admin@example.com,admin,Admin,User,administrator,admin
+test@example.com,testuser,Test,User,customer,customer
+kalle@gmail.com,kalle,Kalle,Kalle,customer,customer
+kelleplutt@gmail.com,kelleplutt,Kelle,Plutt,customer,customer
