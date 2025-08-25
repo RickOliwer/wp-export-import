@@ -5,7 +5,13 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
+    "build": "npm run lint && npm run type-check",
+    "clean": "rm -rf dist",
+    "compile": "tsc --project tsconfig.build.json",
+    "lint": "eslint src --ext .ts,.js",
+    "type-check": "tsc --noEmit",
     "test": "echo \"Error: no test specified\" && exit 1",
+    "start:prod": "node dist/index.js",
     "start": "tsx src/index.ts"
   },
   "keywords": [],
@@ -19,6 +25,7 @@
     "zod": "^4.1.1"
   },
   "devDependencies": {
+    "@eslint/js": "^9.34.0",
     "@types/express": "^5.0.3",
     "@types/node": "^24.3.0",
     "@typescript-eslint/eslint-plugin": "^8.40.0",
@@ -26,6 +33,7 @@
     "eslint": "^9.34.0",
     "prettier": "^3.6.2",
     "tsx": "^4.20.5",
-    "typescript": "^5.9.2"
+    "typescript": "^5.9.2",
+    "typescript-eslint": "^8.40.0"
   }
 }

@@ -1,4 +1,9 @@
 import type { ImportRow } from "../types/user.js";
+import type {
+  WordPressUser,
+  CreateUserPayload,
+  UpdateUserPayload,
+} from "../types/wordpress.js";
 import { env } from "../config/index.js";
 import { HttpError } from "../utils/httpError.js";
 
@@ -26,10 +31,12 @@ async function wp<T>(path: string, init?: RequestInit): Promise<T> {
   return (await res.json()) as T;
 }
 
-export async function findUserByEmail(email: string) {
+export async function findUserByEmail(
+  email: string
+): Promise<WordPressUser | undefined> {
   const url = new URL("/wp-json/wp/v2/users", env.WP_SITE);
   url.searchParams.set("search", email);
-  const arr = await wp<any[]>(
+  const arr = await wp<WordPressUser[]>(
     url.pathname + "?" + url.searchParams.toString(),
     { method: "GET" }
   );
@@ -56,29 +63,32 @@ function randPass() {
   return Buffer.from(buf).toString("base64url");
 }
 
-export async function createUser(row: ImportRow) {
-  const payload: any = {
-    username: row.username ?? row.email.split("@")[0],
+export async function createUser(row: ImportRow): Promise<WordPressUser> {
+  const payload: CreateUserPayload = {
+    username: row.username ?? row.email.split("@")[0] ?? "user",
     email: row.email,
     password: row.password ?? randPass(),
     name: [row.first_name, row.last_name].filter(Boolean).join(" ").trim(),
     roles: row.roles ?? ["customer"],
     meta: buildMeta(row),
   };
-  return wp<any>("/wp-json/wp/v2/users", {
+  return wp<WordPressUser>("/wp-json/wp/v2/users", {
     method: "POST",
     body: JSON.stringify(payload),
   });
 }
 
-export async function updateUser(id: number, row: ImportRow) {
-  const payload: any = {
+export async function updateUser(
+  id: number,
+  row: ImportRow
+): Promise<WordPressUser> {
+  const payload: UpdateUserPayload = {
     name: [row.first_name, row.last_name].filter(Boolean).join(" ").trim(),
     roles: row.roles ?? ["customer"],
     meta: buildMeta(row),
   };
   if (row.password) payload.password = row.password;
-  return wp<any>(`/wp-json/wp/v2/users/${id}`, {
+  return wp<WordPressUser>(`/wp-json/wp/v2/users/${id}`, {
     method: "POST",
     body: JSON.stringify(payload),
   });
