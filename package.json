@@ -5,14 +5,15 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "build": "npm run lint && npm run type-check",
     "clean": "rm -rf dist",
+    "clean:src": "find src -name '*.js' -o -name '*.js.map' -o -name '*.d.ts.map' | xargs rm -f 2>/dev/null || true && find src -name '*.d.ts' ! -path 'src/utils/types/*' | xargs rm -f 2>/dev/null || true",
     "compile": "tsc --project tsconfig.build.json",
+    "build": "npm run clean && npm run clean:src && tsc",
     "lint": "eslint src --ext .ts,.js",
     "type-check": "tsc --noEmit",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start:prod": "node dist/index.js",
-    "start": "tsx src/index.ts"
+    "dev": "tsx watch src/index.ts",
+    "start": "node -r tsconfig-paths/register dist/index.js"
   },
   "keywords": [],
   "author": "",
@@ -24,6 +25,7 @@
     "express": "^5.1.0",
     "multer": "^2.0.2",
     "pino": "^9.9.0",
+    "tsconfig-paths": "^4.2.0",
     "zod": "^4.1.1"
   },
   "devDependencies": {
