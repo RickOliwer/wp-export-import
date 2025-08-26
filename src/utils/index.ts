@@ -15,10 +15,13 @@ function buildMeta(row: ImportRow) {
   }
 
   for (const [k, v] of Object.entries(row.meta ?? {})) meta[k] = String(v);
+
+  // WooCommerce billing fields - these should show up in the form
   for (const [k, v] of Object.entries(row.wc_billing ?? {}))
     meta[`billing_${k}`] = String(v);
   for (const [k, v] of Object.entries(row.wc_shipping ?? {}))
     meta[`shipping_${k}`] = String(v);
+
   return meta;
 }
 

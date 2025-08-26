@@ -21,8 +21,6 @@ async function getUser(email: string) {
 async function createUser(row: ImportRow) {
   if (!row.email) throw new Error("Email is required");
 
-  console.log("Creating user with row:", JSON.stringify(row, null, 2));
-
   const payload: CreateUserPayload = {
     username: row.username ?? row.email.split("@")[0] ?? "user",
     email: row.email,
@@ -32,8 +30,6 @@ async function createUser(row: ImportRow) {
     roles: row.roles ?? ["customer"],
     meta: buildMeta(row),
   };
-
-  console.log("User payload:", JSON.stringify(payload, null, 2));
 
   if (row.first_name) payload.first_name = row.first_name;
   if (row.last_name) payload.last_name = row.last_name;
@@ -49,10 +45,12 @@ async function createUser(row: ImportRow) {
     .trim();
   if (displayName) payload.name = displayName;
 
-  return wp<WordPressUser>("/wp-json/wp/v2/users", {
+  const result = await wp<WordPressUser>("/wp-json/wp/v2/users", {
     method: "POST",
     body: JSON.stringify(payload),
   });
+
+  return result;
 }
 
 async function updateUser(id: number, row: ImportRow) {

@@ -11,7 +11,7 @@ export async function loadCSV(path: string): Promise<ImportRow[]> {
 
   for await (const rec of parser) {
     // Limit to first 50 rows for testing
-    if (rows.length >= 30) break;
+    // if (rows.length >= 20) break;
 
     // Skip rows without email
     if (

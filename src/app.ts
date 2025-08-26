@@ -9,8 +9,6 @@ import express, {
 export function createApp(): Express {
   const app = express();
 
-  console.log("Setting up middleware...");
-
   // Add request logging middleware
   app.use((req: Request, res: Response, next: NextFunction) => {
     console.log(`📨 ${req.method} ${req.url} - ${new Date().toISOString()}`);
@@ -21,40 +19,34 @@ export function createApp(): Express {
 
   // Add a root route for testing
   app.get("/", (req: Request, res: Response) => {
-    console.log("Root route hit");
     res.json({
       message: "Server is running",
       timestamp: new Date().toISOString(),
-      routes: ["/api/health", "/api/import"],
+      routes: ["/api/health", "/api/import", "/api/customers"],
     });
   });
 
   // Add basic health check at root level
   app.get("/health", (req: Request, res: Response) => {
-    console.log("Health check hit");
     res.json({ status: "OK", timestamp: new Date().toISOString() });
   });
 
   // Error handling middleware
   app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
-    console.error("❌ Express error:", err);
     res
       .status(500)
       .json({ error: "Internal server error", message: err.message });
   });
 
-  console.log("Middleware setup complete");
-
-  // Import routes after basic setup
+  // Import main routes (which includes both import and customer routes)
   try {
-    console.log("Loading import routes...");
-    import("@routes/import.routes.js")
-      .then(({ routes }) => {
-        app.use("/api", routes);
-        console.log("✅ Import routes loaded");
+    import("@routes/index.js")
+      .then((routesModule) => {
+        app.use("/api", routesModule.default);
+        console.log("✅ All routes loaded");
       })
       .catch((err) => {
-        console.error("❌ Failed to load import routes:", err);
+        console.error("❌ Failed to load routes:", err);
       });
   } catch (error) {
     console.error("❌ Error importing routes:", error);
