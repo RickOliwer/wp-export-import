@@ -17,18 +17,12 @@ export async function importCustomers(
 
     const chunkSize = parseInt(chunk_size || "10", 10);
 
-    console.log(
-      `Starting customer import from ${file} with chunk size ${chunkSize}`
-    );
-
     // Load and parse CSV
     const rows = await loadCSV(file);
-    console.log(`Loaded ${rows.length} rows from CSV`);
 
     // Import customers
     const results = await upsertCustomers(rows, chunkSize);
 
-    console.log("Customer import completed");
     res.json({
       success: true,
       message: "Customer import completed",

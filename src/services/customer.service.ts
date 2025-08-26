@@ -5,7 +5,7 @@ import {
   updateCustomer,
 } from "@clients/customer.fn.js";
 
-export async function upsertCustomers(rows: ImportRow[], chunkSize = 10) {
+export async function upsertCustomers(rows: ImportRow[], chunkSize = 50) {
   const results: Array<{
     status: string;
     email: string;
@@ -22,8 +22,34 @@ export async function upsertCustomers(rows: ImportRow[], chunkSize = 10) {
     const chunkResults = await processCustomerChunk(chunk);
     results.push(...chunkResults);
 
-    console.log("Chunk results:", chunkResults);
+    // Show summary for this chunk
+    const created = chunkResults.filter((r) => r.status === "created").length;
+    const updated = chunkResults.filter((r) => r.status === "updated").length;
+    const errors = chunkResults.filter((r) => r.status === "error");
+
+    console.log(
+      `Chunk summary: ${created} created, ${updated} updated, ${errors.length} failed`
+    );
+
+    // Only show error details
+    if (errors.length > 0) {
+      console.log("Failed customers:");
+      errors.forEach((error) => {
+        console.log(`  - ${error.email}: ${error.error}`);
+      });
+    }
   }
+
+  // Show overall summary
+  const totalCreated = results.filter((r) => r.status === "created").length;
+  const totalUpdated = results.filter((r) => r.status === "updated").length;
+  const totalErrors = results.filter((r) => r.status === "error").length;
+
+  console.log(`\n=== FINAL SUMMARY ===`);
+  console.log(`Total processed: ${results.length}`);
+  console.log(`Created: ${totalCreated}`);
+  console.log(`Updated: ${totalUpdated}`);
+  console.log(`Failed: ${totalErrors}`);
 
   return results;
 }
@@ -42,18 +68,13 @@ async function processCustomerChunk(rows: ImportRow[]) {
       const existingCustomer = await getWooCommerceCustomer(row.email);
 
       if (existingCustomer) {
-        console.log(
-          `Customer ${row.email} already exists with ID ${existingCustomer.id}, updating...`
-        );
         const updatedCustomer = await updateCustomer(existingCustomer.id, row);
         return { status: "updated", email: row.email, id: updatedCustomer.id };
       } else {
-        console.log(`Creating new customer ${row.email}...`);
         const newCustomer = await createCustomer(row);
         return { status: "created", email: row.email, id: newCustomer.id };
       }
     } catch (error) {
-      console.error(`Failed to process customer ${row.email}:`, error);
       return {
         status: "error",
         email: row.email,

@@ -1,7 +1,7 @@
 import { createUser, updateUser, getUser } from "@clients/user.fn.js";
 import type { ImportRow } from "@utils/types/user.js";
 
-export async function upsertUsers(rows: ImportRow[], chunkSize = 10) {
+export async function upsertUsers(rows: ImportRow[], chunkSize = 50) {
   const results: Array<{
     email: string;
     id?: number;
@@ -9,7 +9,6 @@ export async function upsertUsers(rows: ImportRow[], chunkSize = 10) {
     error?: string;
   }> = [];
 
-  console.log("Rows in upsertUsers:", rows);
   // Process in chunks
   for (let i = 0; i < rows.length; i += chunkSize) {
     const chunk = rows.slice(i, i + chunkSize);

@@ -33,15 +33,10 @@ export async function importJSON(req: Request, res: Response) {
 }
 
 export async function testCSVImport(req: Request, res: Response) {
-  console.log("Testing CSV import...");
-
   try {
     const filename = req.body?.filename || "users.csv";
-    console.log(`Loading CSV file: ${filename}`);
 
     const rows = await loadCSV(`uploads/${filename}`);
-    console.log(`Loaded ${rows.length} rows`);
-    console.log("First row sample:", JSON.stringify(rows[0], null, 2));
 
     const result = await upsertUsers(rows);
     console.log("Import completed");

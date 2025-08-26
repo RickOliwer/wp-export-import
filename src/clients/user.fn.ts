@@ -21,8 +21,6 @@ async function getUser(email: string) {
 async function createUser(row: ImportRow) {
   if (!row.email) throw new Error("Email is required");
 
-  console.log("Creating user with row:", JSON.stringify(row, null, 2));
-
   const payload: CreateUserPayload = {
     username: row.username ?? row.email.split("@")[0] ?? "user",
     email: row.email,
@@ -32,8 +30,6 @@ async function createUser(row: ImportRow) {
     roles: row.roles ?? ["customer"],
     meta: buildMeta(row),
   };
-
-  console.log("User payload meta:", JSON.stringify(payload.meta, null, 2));
 
   if (row.first_name) payload.first_name = row.first_name;
   if (row.last_name) payload.last_name = row.last_name;
@@ -53,10 +49,6 @@ async function createUser(row: ImportRow) {
     method: "POST",
     body: JSON.stringify(payload),
   });
-
-  // Debug: Check what meta was actually saved
-  console.log("Created user ID:", result.id);
-  console.log("User meta that was saved:", result.meta);
 
   return result;
 }
